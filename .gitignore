@@ -1,0 +1,5 @@
+/Drunkenbolde/bin/
+/Drunkenbolde/obj/
+.git
+.vs
+packages/
