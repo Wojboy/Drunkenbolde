@@ -163,8 +163,33 @@ namespace DrunkenboldeServer
             Clients.All.broadcastMessage((int)MessageTypes.ChangeState, (int)state);
             if (Config.LobbyState == LobbyStates.DuplicateDrinksResults)
             {
+                foreach (var d in Config.DDResult.States)
+                {
+                    var player = Config.Players.FirstOrDefault(p => p.Id == d.PlayerId);
+                    if (player != null)
+                    {
+                        int add = 0;
+                        if ((Config.DDResult.Black && d.AmountBlack > 0) || (!Config.DDResult.Black && d.AmountRed > 0))
+                        {
+                            add = 3;
+                        }
+                        else if ((!Config.DDResult.Black && d.AmountBlack > 0) ||
+                                 (Config.DDResult.Black && d.AmountRed > 0))
+                        {
+                            add = -3;
+                        }
+                        else
+                        {
+                            continue;
+                        }
+
+                        player.Points += add;
+                    }
+
+                }
                 string jsonString = JsonConvert.SerializeObject(Config.DDResult);
                 Clients.All.broadcastMessage((int)MessageTypes.LobbyUpdate, jsonString);
+                UpdatePlayerBoard();
 
             }
             else if (Config.LobbyState == LobbyStates.DuplicateDrinks)
@@ -180,11 +205,6 @@ namespace DrunkenboldeServer
                     Config.DDResult.States.Add(new DuplicateDrinksState() {PlayerId = p.Id, PlayerName = p.DisplayName});
                 }
             }
-            else if (Config.LobbyState == LobbyStates.DuplicateDrinksResults)
-            {
-                string jsonString = JsonConvert.SerializeObject(Config.DDResult);
-                Clients.All.broadcastMessage((int)MessageTypes.LobbyUpdate, jsonString);
-            }
             else if (Config.LobbyState == LobbyStates.ShareDrinks)
             {
                 
@@ -194,7 +214,7 @@ namespace DrunkenboldeServer
         public void Lobbyupdate(string key, string data)
         {
             GameConfig.Player player = Config.Players.FirstOrDefault(p => p.Key == key);
-            if (player != null && !player.Active)
+            if (player != null && player.Active)
             {
                 if (Config.LobbyState == LobbyStates.DuplicateDrinks)
                 {
@@ -206,7 +226,7 @@ namespace DrunkenboldeServer
                         return;
                     
                     int black, red;
-                    if (int.TryParse(sp[0], out black) && int.TryParse(sp[0], out red))
+                    if (int.TryParse(sp[0], out black) && int.TryParse(sp[1], out red))
                     {
                         var dState = Config.DDResult.States.FirstOrDefault(p => p.PlayerId == player.Id);
                         if (dState == null)

@@ -113,7 +113,6 @@ $(function () {
                     $.each(obj2["States"],
                         function (i, item) {
                             if (item["PlayerId"] === userId) {
-                                item["AmountBlack"] = 3;
                                 if ((isBlack && item["AmountBlack"] > 0) || (!isBlack && item["AmountRed"] > 0)) {
                                     $("#duplicate-results-desc")
                                         .html("Du hast gewonnen <div style='color: mediumaquamarine;'>+ 3</div>");
@@ -131,8 +130,6 @@ $(function () {
                                 } else {
                                     $("#duplicate-other-results").append("<div class='duplicate-result-entry duplicate-results-lost'>" + item["PlayerName"] + " - 3 </div> ");
                                 }
-
-
                             }
                         });
                 }
@@ -165,6 +162,9 @@ $(function () {
         else if (state === lobbyState.DuplicateDrinksResults) {
             $("#duplicate-drinks-results-scene").show();
             cardLoader();
+        }
+        else if (state === lobbyState.ShareDrinks) {
+            $("#share-drinks-scene").show();
         }
     }
 
@@ -232,6 +232,7 @@ $(function () {
             hideCoins();
         }
         if (points >= 3 && duplicate_card !== 1) {
+
             duplicate_card = 1;
             $("#card-black .card-coins").show();
             game.server.lobbyupdate(password, "3-0");

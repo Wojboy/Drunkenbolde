@@ -56,7 +56,8 @@ namespace DrunkenboldeServer
         public DateTime nextStep;
         public GameHub.LobbyStates LobbyState = GameHub.LobbyStates.Waiting;
         public DuplicateDrinksResult DDResult;
-        public ShareDrinksResult SDResult;
+
+        public List<ShareDrinksPlayerData> PlayerData;
 
 
         [JsonObject(MemberSerialization.OptIn)]
@@ -78,8 +79,11 @@ namespace DrunkenboldeServer
         }
 
         [JsonObject(MemberSerialization.OptIn)]
-        public class ShareDrinksResult
+        public class ShareDrinksPlayerData
         {
+            public int PlayerId;
+            public int Availaible;
+            public int Used;
             [JsonProperty]
             public List<ShareDrinksPlayer> ShareDrinks { get; set; }
         }
