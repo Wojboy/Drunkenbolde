@@ -1,4 +1,5 @@
 ﻿using System;
+using DrunkenboldeServer.Models;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
@@ -58,25 +59,7 @@ namespace DrunkenboldeServer
         public DuplicateDrinksResult DDResult;
 
         public List<ShareDrinksPlayerData> PlayerData;
-
-
-        [JsonObject(MemberSerialization.OptIn)]
-        public class Player
-        {
-            public string ConnectionId;
-
-            [JsonProperty] public bool IsAdmin { get; set; }
-            public string Key { get; set; }
-
-            [JsonProperty] public string DisplayName { get; set; }
-
-            [JsonProperty] public int Points { get; set; }
-            [JsonProperty] public int OverallPoints { get; set; }
-
-            public bool Active { get; set; }
-
-            [JsonProperty] public int Id { get; set; }
-        }
+                     
 
         [JsonObject(MemberSerialization.OptIn)]
         public class ShareDrinksPlayerData

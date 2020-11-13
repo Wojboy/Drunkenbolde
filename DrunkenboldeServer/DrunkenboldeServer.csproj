@@ -108,6 +108,9 @@
   <ItemGroup>
     <Compile Include="GameConfig.cs" />
     <Compile Include="GameHub.cs" />
+    <Compile Include="GameLoop.cs" />
+    <Compile Include="GameRoom.cs" />
+    <Compile Include="Models\Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>

@@ -140,6 +140,11 @@ $(function () {
         }
     };
 
+    game.client.addNewMessageToPage = function (message) {
+        // Add the message to the page. 
+        displaySmallMessage(message);
+    };
+
 
     $.connection.hub.start().done(function () {
         if (password == undefined)
