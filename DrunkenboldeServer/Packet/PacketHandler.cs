@@ -35,17 +35,42 @@ namespace DrunkenboldeServer.Packet
                 case PacketType.ChangeScene:
                     return typeof(ChangeScenePacket);
                     break;
+                case PacketType.GambleResult:
+                    return typeof(GambleResultPacket);
+                    break;
+                case PacketType.GambleSet:
+                    return typeof(GambleSetPacket);
+                    break;
+                case PacketType.LoginPacketAnswer:
+                    return typeof(LoginAnswerPacket);
+                    break;
+                case PacketType.Message:
+                    return typeof(MessagePacket);
+                    break;
+                case PacketType.PlayerList:
+                    return typeof(PlayerListPacket);
+                    break;
+                case PacketType.ShareSet:
+                    return typeof(ShareSetPacket);
+                case PacketType.ShareResult:
+                    return typeof(ShareResultPacket);
                 default:
                     return null;
             }
         }
     }
 
+
     public enum PacketType
     {
         LoginPacket = 0,
-        Message = 1,
-        PlayerList = 2,
-        ChangeScene = 3,
+        LoginPacketAnswer = 1,
+        Message = 2,
+        PlayerList = 3,
+        ChangeScene = 4,
+        GambleSet = 5,
+        GambleResult = 6,
+        ShareSet = 7,
+        ShareResult = 8
     }
 }

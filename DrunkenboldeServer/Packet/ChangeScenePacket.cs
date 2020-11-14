@@ -10,7 +10,7 @@ namespace DrunkenboldeServer.Packet
     public class ChangeScenePacket : JsonPacket
     {
         [JsonProperty]
-        public SceneType SceneType { get; set; }
+        public int SceneType { get; set; }
 
         [JsonProperty]
         public int SceneDuration { get; set; }

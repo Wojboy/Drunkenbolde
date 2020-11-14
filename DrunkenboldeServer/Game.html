@@ -11,6 +11,7 @@
     <script src="signalr/hubs"></script>
     <!--Add script to update the page and send messages.--> 
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+    <script src="Scripts/jquery.mousewheel.min.js"></script>
     <script src="Scripts/main.js"></script>
 
     <link rel="stylesheet" href="Style/main.css">
@@ -54,24 +55,12 @@
     </div>
     <div class="scene" id="share-drinks-scene">
         <center>
-            <div class="scene-title">Schlücke austeilen</div>
-            <div class="scene-description">Schrolle auf einem Element um die Schlücke zu erhöhen / zu verringern, Verfügbar: </div>
-            <div class="share-drinks-group">
-
-                <div class="share-drink-element"></div>
-                    
-                </div>
-
+            <div class="scene-title" id="share-title">Schlücke verteilen</div>
+            <div class="scene-description" id="share-description">Schrolle auf einem Element um die Schlücke zu erhöhen / zu verringern, Verfügbar: <div class="share-player-amount-total">0</div></div>
+            <div class="share-player-list">
+            </div>
         </center>
     </div>
-</div>
-<div class="admin-menu">
-    <button class="admin-button" id="admin-skip" class="skip">Weiter</button>
-    <br/><br/>
-    <select id="admin-game-select">
-
-    </select>
-    <button class="admin-button" id="admin-start-game">Starte Spiel</button>
 </div>
 <div class="top-right-menu">
     <div class="player-tab">
@@ -96,6 +85,8 @@
     </div>
 
 
+</div>
+<div class="scene-timer">
 </div>
 </body>
 </html>

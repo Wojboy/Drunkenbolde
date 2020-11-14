@@ -68,7 +68,7 @@ namespace DrunkenboldeServer
             public int Availaible;
             public int Used;
             [JsonProperty]
-            public List<ShareDrinksPlayer> ShareDrinks { get; set; }
+            public List<ShareDrinksPlayer> Share { get; set; }
         }
 
         [JsonObject(MemberSerialization.OptIn)]

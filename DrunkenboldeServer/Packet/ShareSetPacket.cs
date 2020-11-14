@@ -7,23 +7,22 @@ using Newtonsoft.Json;
 namespace DrunkenboldeServer.Packet
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public class LoginPacket : JsonPacket
+    public class ShareSetPacket : JsonPacket
     {
         [JsonProperty]
-        public string Room;
+        public int PlayerId;
 
         [JsonProperty]
-        public string DisplayName;
-
+        public int Amount;
 
         public override bool IsValid()
         {
-            return !(string.IsNullOrEmpty(Room) || string.IsNullOrEmpty(DisplayName) || DisplayName.Length > 30);
+            return PlayerId >= 0 && Amount >= 0;
         }
 
         public override PacketType GetPacketType()
         {
-            return PacketType.LoginPacket;
+            return PacketType.ShareSet;
         }
     }
 }

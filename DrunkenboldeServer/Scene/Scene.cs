@@ -1,25 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using DrunkenboldeServer.Models;
 using DrunkenboldeServer.Packet;
 
-namespace DrunkenboldeServer
+namespace DrunkenboldeServer.Scene
 {
     public abstract class Scene
     {
-        public string Name;
-        public int SceneTime;
+        public DateTime StartTime;
+        
         protected GameRoom Room;
         protected SceneManager SceneManager;
+        public bool IsDone { get; set; }
 
         public abstract Type NextScene();
-        public abstract void OnPacketReceived(Player player, JsonPacket Packet);
+        public abstract void OnPacketReceived(Player player, JsonPacket packet);
         public abstract void OnPlayerConnected(Player player);
         public abstract void OnPlayerDisconnected(Player player);
 
-        public void Init(GameRoom room, SceneManager scene)
+        public virtual void Init(GameRoom room, SceneManager scene)
         {
             SceneManager = scene;
             Room = room;
@@ -28,5 +26,7 @@ namespace DrunkenboldeServer
         public abstract void OnSceneStarted();
         public abstract void OnSceneClosed();
         public abstract SceneType GetSceneType();
+        public abstract int GetSceneTime();
+        public abstract void Tick();
     }
 }

@@ -4,74 +4,73 @@ img.src = src = "Data/cards.svg";
 $(function () {
     // globals
     var timer = null;
-    var logged = false;
+    var scenerTime = null;
     var userId = -1;
     var displayName = undefined;
+    var roomName = undefined;
+
     var overallPoints = 0;
     var points = 0;
 
     var currentGame = undefined;
-    var currentLobbyState = 0;
+    var currentScene = 0;
+    var currentSceneDuration = -1;
+
+    var sharePointsAvailable = 0;
 
     var game = undefined;
-    var password = undefined;
-
     var duplicate_card = 0;
 
-    const messageTypes = Object.freeze({ "MessageSmall": 0, "MessageBig": 1, "Leaderboard": 2, "Login": 3, "ChangeState": 4, "LobbyUpdate": 5});
-    const lobbyState = Object.freeze({ "Waiting": 0, "ShareDrinks": 1, "ShareDrinksResults": 2, "DuplicateDrinks": 3, "DuplicateDrinksResults": 4, "InGame": 5, "GameEnded" : 6 });
-    var lobbyStatesNames = ['Warteraum', 'Schlücke austeilen', 'Schlücke Ergebnisse', 'Gamble', 'Gamble Ergebnisse' , 'Spiel: ', 'Spiel vorbei'];
-    var gameNames = ["Pferderennen"];
 
-    var loginCookie = Cookies.get("login");
-    if (loginCookie == undefined) {
+    const messageTypes = Object.freeze({"LoginPacket": 0, "LoginPacketAnswer": 1, "Message" : 2, "PlayerList": 3, "ChangeScene": 4, "GambleSet": 5, "GambleResult": 6, "ShareSet": 7, "ShareResult": 8});
+    const sceneTypes = Object.freeze({ "Waiting": 0, "Gamble": 1, "Share": 2 });
+    var sceneStatesNames = ['Warteraum', 'Gamble', 'Schlücke verteilen' , 'Spiel: ', 'Spiel vorbei'];
+    var gameNames = ["Pferderennen"];
+    var nameCookie = Cookies.get("name");
+    var roomCookie = Cookies.get("room");
+    var playerTable = null;
+
+    if (roomCookie == undefined || nameCookie == undefined) {
         window.location.href = "Login.html";
         return;
     } else {
-        password = loginCookie;
+        displayName = nameCookie;
+        roomName = roomCookie;
     }
 
     var game = $.connection.gameHub;
-    game.client.broadcastMessage = function (messageType, messageData) {
-        if (!logged) {
-            if (messageType === messageTypes.Login) {
-                if (messageData === "-1") {
-                    Cookies.delete("login");
+    game.client.post = function (messageType, messageData) {
+
+        if (userId === -1) {
+            if (messageType === messageTypes.LoginPacketAnswer) {
+                var obj1 = jQuery.parseJSON(messageData);
+                if (obj1["PlayerId"] === -1) {
+                    Cookies.remove("name");
+                    Cookies.remove("room");
                     window.location.href = "Login.html";
                 } else {
-                    userId = messageData;
-                    logged = true;
+                    userId = obj1["PlayerId"];
+
+                    // Eingeloggt;
+
+                    sceneTimer = window.setInterval(updateSceneTimer, 1000);
                 }
+            } else {
+                alert("Unknown packet while not logged" + messageData);
             }
         } else {
             // Eingeloggt
-
-            if (messageType === messageTypes.MessageSmall) {
-                displaySmallMessage(messageData);
-            }
-            else if (messageType === messageTypes.MessageBig) {
-                displayBigMessage(messageData);
-            }
-            else if (messageType === messageTypes.Leaderboard) {
-                var obj = jQuery.parseJSON(messageData);
+            if (messageType === messageTypes.Message) {
+                var obj5 = jQuery.parseJSON(messageData);
+                displaySmallMessage(obj5["Message"]);
+            } else if (messageType === messageTypes.PlayerList) {
+                var obj2 = jQuery.parseJSON(messageData);
+                playerTable = obj2;
                 $(".player-highscore-table tbody > tr").remove();
-                $.each(obj,
-                    function (i, item) {
-                        if (item["Id"] === userId) {
-                            if (item["IsAdmin"]) {
+                $.each(obj2["Players"],
+                    function(i, item) {
 
-                                $(".admin-menu").show();
-
-                                $.each(gameNames, function (key, value) {
-                                    $('#admin-game-select')
-                                        .append($("<option></option>")
-                                            .attr("value", key)
-                                            .text(value));
-                                });
-
-                                timer = setInterval(adminPing, 1000);
-                            }
-                            displayName = item["DisplayName"];
+                        if (item["PlayerId"] === userId) {
                             points = item["Points"];
                             overallPoints = item["OverallPoints"];
 
@@ -79,7 +78,7 @@ $(function () {
                             $(".player-points-value").html(points);
                         }
                         var ele = "<tr><td>" +
-                            (i + 1) + 
+                            (i + 1) +
                             "</td><td>" +
                             item["DisplayName"] +
                             "</td><td>" +
@@ -89,19 +88,26 @@ $(function () {
                             "</td></tr>";
                         $(".player-highscore-table tbody").append(ele);
                     });
+            } else if (messageType === messageTypes.ChangeScene) {
+                var obj3 = jQuery.parseJSON(messageData);
+                currentScene = obj3["SceneType"];
+                currentSceneDuration = obj3["SceneDuration"];
+                changeVisualSceneState(currentScene);
+                changeScene(currentScene);
             }
-            else if (messageType === messageTypes.ChangeState) {
-                currentLobbyState = messageData;
-                changeVisualLobbyState(currentLobbyState);
 
-                if (currentLobbyState !== lobbyState.InGame) {
-                    changeScene(currentLobbyState);
-                }
-            }
-            else if (messageType === messageTypes.LobbyUpdate) {
-                if (currentLobbyState === lobbyState.DuplicateDrinksResults) {
-                    var obj2 = jQuery.parseJSON(messageData);
-                    var isBlack = obj2["black"];
+
+            // Auswertung nach Scene
+
+            if (currentScene === sceneTypes.Waiting) {
+
+            } else if (currentScene === sceneTypes.Gamble) {
+                if (messageType === messageTypes.GambleResult) {
+                    $(".scene-manager").children().hide();
+                    $("#duplicate-drinks-results-scene").show();
+
+                    var obj4 = jQuery.parseJSON(messageData);
+                    var isBlack = obj4["black"];
                     if (isBlack) {
                         $("#mini-card-black").show();
                         $("#mini-card-red").hide();
@@ -110,7 +116,8 @@ $(function () {
                         $("#mini-card-red").show();
                     }
 
-                    $.each(obj2["States"],
+                    cardLoader();
+                    $.each(obj4["States"],
                         function (i, item) {
                             if (item["PlayerId"] === userId) {
                                 if ((isBlack && item["AmountBlack"] > 0) || (!isBlack && item["AmountRed"] > 0)) {
@@ -124,19 +131,45 @@ $(function () {
                                 }
                             } else {
                                 if ((isBlack && item["AmountBlack"] > 0) || (!isBlack && item["AmountRed"] > 0)) {
-                                    $("#duplicate-other-results").append("<div class='duplicate-result-entry duplicate-results-won'>" + item["PlayerName"] + " + 3</div> ");
+                                    $("#duplicate-other-results")
+                                        .append("<div class='duplicate-result-entry duplicate-results-won'>" +
+                                            item["PlayerName"] +
+                                            " + 3</div> ");
                                 } else if (item["AmountBlack"] === 0 && item["AmountRed"] === 0) {
 
                                 } else {
-                                    $("#duplicate-other-results").append("<div class='duplicate-result-entry duplicate-results-lost'>" + item["PlayerName"] + " - 3 </div> ");
+                                    $("#duplicate-other-results")
+                                        .append("<div class='duplicate-result-entry duplicate-results-lost'>" +
+                                            item["PlayerName"] +
+                                            " - 3 </div> ");
                                 }
                             }
                         });
                 }
-                else if (currentLobbyState === lobbyState.ShareDrinks) {
-
+            } else if (currentScene === sceneTypes.Share) {
+                if (messageType === messageTypes.ShareResult) {
+                    displaySmallMessage(messageData);
+                    var obj6 = jQuery.parseJSON(messageData);
+                    $("#share-title").html("Schlücke Verteilen - Ergebnisse");
+                    $("#share-description").html("");
+                    $("#share-drinks-scene").show();
+                    $(".share-player-list").html("");
+                    $.each(obj6["Data"], function(i, item) {
+                        if (item["DrinkValue"] > 0) {
+                            var n2 = "share-player" + item["PlayerId"];
+                            var ele = "<div class='share-player' id='" +
+                                n2 +
+                                "'><div class='share-player-name'>" +
+                                item["DisplayName"] +
+                                "</div><div class='share-player-count'>" +
+                                item["DrinkValue"] +
+                                "</div></div>";
+                            $(".share-player-list").append(ele);
+                        }
+                    });
                 }
             }
+
         }
     };
 
@@ -147,15 +180,18 @@ $(function () {
 
 
     $.connection.hub.start().done(function () {
-        if (password == undefined)
+        if (roomName === undefined || displayName === undefined)
             return;
-
-        game.server.login(password);
+        var loginPacket = new Object();
+        loginPacket.Room = roomName;
+        loginPacket.DisplayName = displayName;
+        var data = JSON.stringify(loginPacket);
+        game.server.post(messageTypes.LoginPacket, data);
     });
     function changeScene(state) {
         $(".scene-manager").children().hide();
 
-        if (state === lobbyState.DuplicateDrinks) {
+        if (state === sceneTypes.Gamble) {
             if (points < 3) {
                 $(".scene-description").text("Du hast nicht genügend Einsätze zum gamblen");
             }
@@ -164,13 +200,105 @@ $(function () {
             $("#duplicate-drinks-scene").show();
             cardLoader();
         }
-        else if (state === lobbyState.DuplicateDrinksResults) {
-            $("#duplicate-drinks-results-scene").show();
-            cardLoader();
-        }
-        else if (state === lobbyState.ShareDrinks) {
+        else if (state === sceneTypes.Share) {
             $("#share-drinks-scene").show();
+            $(".share-player-list").html("");
+            $.each(playerTable["Players"], function (i, item) {
+
+                if (item["PlayerId"] !== userId) {
+                    var n2 = "share-player" + item["PlayerId"];
+                    var ele = "<div class='share-player' id='" +
+                        n2 +
+                        "'><div class='share-player-name'>" +
+                        item["DisplayName"] +
+                        "</div><div class='share-player-count'>0</div></div>";
+                    $(".share-player-list").append(ele);
+                    $("#" + n2).data("val", "0");
+                    $("#" + n2).data("id", item["PlayerId"]);
+                    // Beschränke Updates, sammle alle Änderrungen zsm und schicke erst nach einer Sekunde
+                    $("#" + n2).on('mousewheel',
+                        function (event) {
+                            var locked = $(this).data("locked");
+                            if (!locked)
+                                $(this).data("locked", true);
+                            var v = parseInt($(this).data("val"));
+                            var id = $(this).data("id");
+                            var g = 0;
+                            if (event.deltaY > 0) {
+                                if (v < 5 && sharePointsAvailable > 0) {
+
+                                    g = -1;
+                                    v += 1;
+                                }
+                            } else {
+                                if (v > 0) {
+                                    v -= 1;
+                                    g = 1;
+                                }
+                                  
+                            }
+                            $(this).data("val", v);
+                            sharePointsAvailable += g;
+                            $(".share-player-amount-total").html(sharePointsAvailable);
+
+                            $("#share-player" + id + " .share-player-count").html(v);
+
+                            if (locked)
+                                return;
+                            locked = true;
+                            setTimeout(function() {
+                                    var v2 = $("#share-player" + id).data("val");
+                                    var np = new Object();
+                                    np.PlayerId = id;
+                                    np.Amount = v2;
+                                var data = JSON.stringify(np);
+                                game.server.post(messageTypes.ShareSet, data);
+                                $("#share-player" + id).data("locked", false);
+                                },
+                                1000);
+                        });
+                } else {
+                    sharePointsAvailable = item["Points"];
+
+                    $(".share-player-amount-total").html(sharePointsAvailable);
+                }
+            });
         }
+    }
+
+    $("#card-black").click(function () {
+        if (duplicate_card === 2) {
+            hideCoins();
+        }
+        if (points >= 3 && duplicate_card !== 1) {
+
+            duplicate_card = 1;
+            $("#card-black .card-coins").show();
+            sendGambleSet(3, 0);
+        }
+    });
+
+    $("#card-red").click(function () {
+        if (duplicate_card === 1) {
+            hideCoins();
+        }
+        if (points >= 3 && duplicate_card !== 2) {
+            duplicate_card = 2;
+            $("#card-red .card-coins").show();
+            sendGambleSet(0, 3);
+        }
+    });
+    function sendGambleSet(black, red) {
+        var gambleSetPacket = new Object();
+        gambleSetPacket.AmountRed = black;
+        gambleSetPacket.AmountBlack = red;
+        var data = JSON.stringify(gambleSetPacket);
+        game.server.post(messageTypes.GambleSet, data);
+    }
+
+    function hideCoins() {
+        $("#card-red .card-coins").hide();
+        $("#card-black .card-coins").hide();
     }
 
     function cardLoader() {
@@ -201,12 +329,18 @@ $(function () {
     function displaySmallMessage(message) {
         $("#message-small").text(message);
         $("#message-small").show().fadeOut(2000);
-       
     }
 
-    function changeVisualLobbyState(state) {
+    function displayBigMessage(message) {
+        $("#message-big").text(message);
+        $("#message-big").show();
+        $("#message-big").delay(4000).fadeOut(200);
+
+    }
+
+    function changeVisualSceneState(state) {
         $(".scene-manager").hide();
-        displayBigMessage(lobbyStatesNames[state]);
+        displayBigMessage(sceneStatesNames[state]);
 
         var $top = $('.animation-beer-top');
         $top.css('top', '100%');
@@ -224,41 +358,16 @@ $(function () {
         
 
     }
+    function updateSceneTimer() {
+        if (currentSceneDuration >= 0) {
+            currentSceneDuration -= 1;
+        }
+        if (currentSceneDuration > 0) {
 
-    function displayBigMessage(message) {
-        $("#message-big").text(message);
-        $("#message-big").show();
-        $("#message-big").delay(4000).fadeOut(200);
-
+            $(".scene-timer").show();
+            $(".scene-timer").text(currentSceneDuration);
+        } else {
+            $(".scene-timer").hide();
+        }
     }
-
-    $("#card-black").click(function () {
-        if (duplicate_card === 2) {
-            hideCoins();
-        }
-        if (points >= 3 && duplicate_card !== 1) {
-
-            duplicate_card = 1;
-            $("#card-black .card-coins").show();
-            game.server.lobbyupdate(password, "3-0");
-        }
-    });
-
-    $("#card-red").click(function () {
-        if (duplicate_card === 1) {
-            hideCoins();
-        }
-        if (points >= 3 && duplicate_card !== 2) {
-            duplicate_card = 2;
-            $("#card-red .card-coins").show();
-            game.server.lobbyupdate(password, "0-3");
-        }
-    });
-
-    function hideCoins() {
-        $("#card-red .card-coins").hide();
-        $("#card-black .card-coins").hide();
-    }
-
-
 });

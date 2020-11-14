@@ -61,6 +61,7 @@ namespace DrunkenboldeServer
                     {
                         room.Stop();
                         Rooms.Remove(room);
+                        break;
                     }
                 }
 
@@ -83,12 +84,13 @@ namespace DrunkenboldeServer
         {
             var packet = PacketHandler.DecodePacket(packetNumber, payload);
             if (packet == null)
-                return;
+                throw new Exception("Decoding Error");
+
 
             if (packet.GetType() == typeof(LoginPacket))
             {
                 // Packet is Login Packet
-                LoginPacket loginPacket = new LoginPacket();
+                LoginPacket loginPacket = (LoginPacket) packet;
 
                 var room = Rooms.FirstOrDefault(r => r.RoomName == loginPacket.Room);
 

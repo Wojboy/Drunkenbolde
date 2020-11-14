@@ -14,7 +14,7 @@ namespace DrunkenboldeServer.Packet
 
         public override bool IsValid()
         {
-            return string.IsNullOrEmpty(Message);
+            return !string.IsNullOrEmpty(Message);
         }
 
         public override PacketType GetPacketType()

@@ -12,14 +12,17 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
-            var loginCookie = Cookies.get("login");
-            if (loginCookie == undefined) {
+            var nameCookie = Cookies.get("name");
+            var roomCookie = Cookies.get("room");
+            if (nameCookie == undefined || roomCookie == undefined) {
                 $("#login-container").show();
                 $("#login-button").click(function () {
-                    var pw = $("#inputPassword");
-                    if (pw !== "") {
+                    var name = $("#inputName");
+                    var room = $("#inputRoom");
+                    if (name !== "" && room !== "") {
 
-                        Cookies.set('login', pw.val());
+                        Cookies.set('name', name.val());
+                        Cookies.set('room', name.val());
                         $("#login-container").hide();
                         $("#loader").show();
                         setTimeout(function(){ window.location.href = "Game.html"; }, 1000);
@@ -53,7 +56,12 @@
                     <form class="form-signin">
 
                         <div class="form-label-group">
-                            <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+                            <input type="text" id="inputRoom" class="form-control" placeholder="Raumname" required>
+
+                        </div>
+                        
+                        <div class="form-label-group">
+                            <input type="text" id="inputName" class="form-control" placeholder="Anzeigename" required>
 
                         </div>
 
