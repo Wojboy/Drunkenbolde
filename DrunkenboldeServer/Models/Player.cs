@@ -8,11 +8,12 @@ namespace DrunkenboldeServer.Models
     [JsonObject(MemberSerialization.OptIn)]
     public class Player
     {
+        public Player(string connectionId, string displayName)
+        {
+            ConnectionId = connectionId;
+            DisplayName = displayName;
+        }
         public string ConnectionId;
-
-        [JsonProperty] public bool IsAdmin { get; set; }
-        public string Key { get; set; }
-
         [JsonProperty] public string DisplayName { get; set; }
 
         [JsonProperty] public int Points { get; set; }

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using DrunkenboldeServer.Packet;
 
 namespace DrunkenboldeServer
 {
@@ -12,66 +13,89 @@ namespace DrunkenboldeServer
     /// </summary>
     public class GameRoom
     {
-        private int roomId { get; set; }
         public string RoomName { get; set; }
-        private List<Player> players { get; set; }
-        private IHubContext hubContext { get; set; }
-        private static readonly object padlock = new object();
-        private static GameRoom instance = null;
-        public bool isNew { get; set; }
+        protected List<Player> Players { get; set; }
+        protected SceneManager SceneManager;
+        protected GameSettings Settings;
+        protected GameLoop GameLoop;
 
-        public static GameRoom Instance
+        public GameRoom(string name)
         {
-            get
-            {
-                lock (padlock)
-                {
-                    if (instance == null)
-                    {
-                        instance = new GameRoom();
-                        instance.isNew = true;
-                        
-                    }
+            this.RoomName = name;
+            this.Players = new List<Player>();
+            GameLoop = new GameLoop(this);
+            Settings = new GameSettings();
+            SceneManager = new SceneManager(GameLoop, Settings);
+        }
 
-                    return instance;
-                }
+
+        public void ReceivePacket(string connectionId, LoginPacket loginPacket)
+        {
+            var p = Players.FirstOrDefault(pl => pl.DisplayName == loginPacket.PlayerName);
+            if (p == null)
+            {
+                p = new Player(connectionId, loginPacket.PlayerName);
+                Players.Add(p);
+
+                SceneManager.PlayerConnected(p);
             }
-        }
-
-        public GameRoom()
-        {
-            //this.roomName = name;
-            this.players = new List<Player>();
-        }
-
-        /// <summary>
-        /// Adds a player to the game room.
-        /// </summary>
-        /// <param name="player">The player to add.</param>
-        /// <returns>returns true, if successful, false if not.</returns>
-        public bool AddPlayerToGameRoom(Player player)
-        {
-            if (this.players.Contains(player))
+            else
             {
+                p.ConnectionId = connectionId;
+
+                if(!p.Active)
+                    SceneManager.PlayerConnected(p);
+                // Spieler bereits Aktiv, schmeiße alten Spieler raus
+                //if (p.Active)
+                // Sende disconnect Packet
+
+            }
+
+        }
+
+        public void ReceivePacket(Player player, JsonPacket packet)
+        {
+            SceneManager.ReceivePacket(player, packet);
+        }
+
+        public List<Player> GetPlayers()
+        {
+            return Players;
+        }
+
+        public Player GetPlayer(string conString)
+        {
+            return Players.FirstOrDefault(p => p.ConnectionId == conString);
+        }
+
+        public void PlayerDisconnected(Player player)
+        {
+            SceneManager.PlayerDisconnected(player);
+            player.Active = false;
+        }
+
+        public void Tick()
+        {
+            SceneManager.Tick();
+        }
+
+        public void Stop()
+        {
+            GameLoop.Stop();
+        }
+
+        public bool SendToAllPlayers(JsonPacket packet)
+        {
+            // Sende an alle aktiven Spieler
+
+            var data = PacketHandler.EncodePacket(packet);
+            if (data == null)
                 return false;
-            }
-            this.players.Add(player);
-            return true;
-        }
+            var connectionIds = (from p in Players where p.Active select p.ConnectionId).ToList();
 
-        /// <summary>
-        /// Removes a player from a game room.
-        /// </summary>
-        /// <param name="player">The player.</param>
-        /// <returns>true, if successful, false if not.</returns>
-        public bool RemovePlayerFromGameRoom(Player player)
-        {
-            if (this.players.Contains(player))
-            {
-                this.players.Remove(player);
-                return true;
-            }
-            return false;
+            var hubContext = GlobalHost.ConnectionManager.GetHubContext<GameHub>();
+            hubContext.Clients.Clients(connectionIds).Post(packet.GetPacketType(), data);
+            return true;
         }
     }
 }

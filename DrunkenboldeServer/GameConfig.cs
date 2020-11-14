@@ -7,7 +7,7 @@ namespace DrunkenboldeServer
 {
     public class GameConfig
     {
-
+        /*
         private static GameConfig instance = null;
         private static readonly object padlock = new object();
 
@@ -80,5 +80,7 @@ namespace DrunkenboldeServer
             [JsonProperty]
             public int Amount { get; set; }
         }
+
+    */
     }
 }

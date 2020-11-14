@@ -15,12 +15,13 @@ namespace DrunkenboldeServer
         private GameRoom currentRoom { get; set; }
         private Timer timer { get; set; }
 
+
         public GameLoop(GameRoom room)
         {
             this.currentRoom = room;
             if (room == null)
             {
-                throw new ArgumentNullException("FEHLER! Room fehlt!");
+                throw new ArgumentNullException("Room nicht gefüllt");
             }
             this.timer = new Timer();
             this.timer.Interval = 100;
@@ -43,16 +44,7 @@ namespace DrunkenboldeServer
         /// <param name="state"></param>
         private void CallBack(object sender, ElapsedEventArgs e)
         {
-            /// Kein Spiel gestartet
-            /// Abstimmung starten
-            
-
-
-             
-            var hubContext = GlobalHost.ConnectionManager.GetHubContext<GameHub>();
-            hubContext.Clients.All.addNewMessageToPage("DU BIST EIN OPFER MANN");
-
-            // -> Hub aufrufen und alle anpingen.
+            currentRoom.Tick();
         }
     }
 }

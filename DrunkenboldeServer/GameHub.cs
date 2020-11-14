@@ -13,57 +13,20 @@ namespace DrunkenboldeServer
 {
     public class GameHub : Hub
     {
-        private Random Random = new Random();
-        public enum MessageTypes
-        {
-            MessageSmall = 0,
-            MessageBig = 1,
-            Leaderboard = 2,
-            Login = 3,
-            ChangeState = 4,
-            LobbyUpdate = 5,
-        }
-
-        public enum LobbyStates
-        {
-            Waiting = 0,
-            ShareDrinks = 1,
-            ShareDrinksResults = 2,
-            DuplicateDrinks = 3,
-            DuplicateDrinksResults = 4,
-            InGame = 5,
-            GameEnded = 6,
-        }
-
-        public static GameConfig Config;
-
-
-
-
-        public GameHub()
-        {
-            if (Config == null)
-            {
-                Config = GameConfig.Instance;
-            }
-
-        }
-
-
+        // GameHub wird nur als Verbindungsmanager benutzt, Handling der Packetzuordnung findet in GameRoomManager statt
 
         public override Task OnDisconnected(bool stopCalled)
         {
-            var player = Config.Players.FirstOrDefault(p => p.ConnectionId == Context.ConnectionId);
-            if (player != null)
-            {
-                player.Active = false;
-                SendMessage("Spieler '" + player.DisplayName + "' ist raus.");
-                player.ConnectionId = null;
-            }
-
+            GameRoomManager.Instance.OnDisconnected(Context.ConnectionId);
             return base.OnDisconnected(stopCalled);
         }
 
+        public void Transmit(int packetType, string payload)
+        {
+            GameRoomManager.Instance.PacketReceived(packetType, payload, Context.ConnectionId);
+        }
+
+        /*
         /// <summary>
         /// Login to a room, if no room present -> Create a room. On Room creation we create a gameloop.
         /// </summary>
@@ -75,66 +38,40 @@ namespace DrunkenboldeServer
                 return;
             }
 
-            var room = GameRoom.Instance;
-            if (room.isNew)
-            {
-                room.RoomName = key;
-            }
+            var room = GameRoomManager.Instance.GetGameRoom(key);
+            room.AddPlayer(Context.ConnectionId);
 
-            var player = new Player();
-            player.ConnectionId = Context.ConnectionId;
-            room.AddPlayerToGameRoom(player);
 
-            var gameLoop = new GameLoop(room);
-            gameLoop.Start();
 
             
 
-            //var player = Config.Players.FirstOrDefault(p => p.Key == key);
-            //if (player != null && !player.Active)
-            //{
-            //    Clients.Client(Context.ConnectionId).broadcastMessage((int)MessageTypes.Login, player.Id);
-            //    player.ConnectionId = Context.ConnectionId;
-            //    player.Active = true;
-            //    SendMessage("Spieler '" + player.DisplayName + "' ist da");
-            //    UpdatePlayerBoard();
-            //    Clients.Client(Context.ConnectionId).broadcastMessage((int)MessageTypes.ChangeState, (int)Config.LobbyState);
-
-
-            //    if (Config.LobbyState == LobbyStates.DuplicateDrinks)
-            //    {
-            //        if (Config.DDResult.States.Count(p => p.PlayerId == player.Id) == 0)
-            //        {
-            //            var state = new DuplicateDrinksState() {PlayerId = player.Id, AmountBlack = 0, AmountRed = 0};
-            //            Config.DDResult.States.Add(state);
-            //        }
-            //    }
-            //    else if (Config.LobbyState == LobbyStates.DuplicateDrinksResults)
-            //    {
-            //        string jsonString = JsonConvert.SerializeObject(Config.DDResult);
-            //        Clients.Client(player.ConnectionId).broadcastMessage((int)MessageTypes.LobbyUpdate, jsonString);
-            //    }
-            //}
-            //else
-            //{
-            //    Clients.Client(Context.ConnectionId).broadcastMessage((int)MessageTypes.Login, -1);
-            //}
-        }
-
-        public void Ping()
-        {
-            var player = Config.Players.FirstOrDefault(p => p.ConnectionId == Context.ConnectionId);
-            if (player != null && player.IsAdmin && player.Active)
+   
             {
-                CheckState(false);
+                Clients.Client(Context.ConnectionId).broadcastMessage((int)MessageTypes.Login, player.Id);
+                player.ConnectionId = Context.ConnectionId;
+                player.Active = true;
+                SendMessage("Spieler '" + player.DisplayName + "' ist da");
+                UpdatePlayerBoard();
+                Clients.Client(Context.ConnectionId).broadcastMessage((int)MessageTypes.ChangeState, (int)Config.LobbyState);
+
+
+                if (Config.LobbyState == LobbyStates.DuplicateDrinks)
+                {
+                    if (Config.DDResult.States.Count(p => p.PlayerId == player.Id) == 0)
+                    {
+                        var state = new DuplicateDrinksState() {PlayerId = player.Id, AmountBlack = 0, AmountRed = 0};
+                        Config.DDResult.States.Add(state);
+                    }
+                }
+                else if (Config.LobbyState == LobbyStates.DuplicateDrinksResults)
+                {
+                    string jsonString = JsonConvert.SerializeObject(Config.DDResult);
+                    Clients.Client(player.ConnectionId).broadcastMessage((int)MessageTypes.LobbyUpdate, jsonString);
+                }
             }
-        }
-        public void Next()
-        {
-            var player = Config.Players.FirstOrDefault(p => p.ConnectionId == Context.ConnectionId);
-            if (player != null && player.IsAdmin && player.Active)
+            else
             {
-                CheckState(true);
+                Clients.Client(Context.ConnectionId).broadcastMessage((int)MessageTypes.Login, -1);
             }
         }
 
@@ -309,5 +246,7 @@ namespace DrunkenboldeServer
         public int AmountRed { get; set; }
         [JsonProperty]
         public int AmountBlack { get; set; }
+    }
+    */
     }
 }
