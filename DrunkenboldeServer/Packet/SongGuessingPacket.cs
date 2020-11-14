@@ -11,6 +11,11 @@ namespace DrunkenboldeServer.Packet
     {
         [JsonProperty]
         public string SongLink { get; set; }
+        [JsonProperty]
+        public string SongTitle { get; set; }
+        [JsonProperty]
+        public string SongArtist { get; set; }
+
 
         public override PacketType GetPacketType()
         {

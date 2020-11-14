@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using DrunkenboldeServer.Packet;
 
 namespace DrunkenboldeServer.GameLogic.SongGuessing
 {
     public static class SongGuesserHelper
     {
-        public static string ProcessLink(string link)
+        internal static string ProcessLink(string link)
         {
             //var result = Uri.TryCreate(link, UriKind.Absolute, out Uri uriResult);
 
@@ -21,5 +22,13 @@ namespace DrunkenboldeServer.GameLogic.SongGuessing
             return id;
         }
 
+        internal static bool CheckIfAnswerRight(SongGuessingAnswerPacket songAnswerPacket, Song currentSong)
+        {
+            if (songAnswerPacket.SongArtist == currentSong.Artist || songAnswerPacket.SongTitle == currentSong.Title)
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }

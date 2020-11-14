@@ -10,13 +10,35 @@ namespace DrunkenboldeServer.Scene
 {
     public class SongGuessingScene : Scene
     {
+        private Song currentSong { get; set; }
+
         public override void Init(GameRoom room, SceneManager scene)
         {
             base.Init(room, scene);
+            currentSong = new Song();
+            this.DetermineWhoIsSongProvider();
+        }
 
+        /// <summary>
+        /// Determines who is SongProvider // Host.
+        /// </summary>
+        private void DetermineWhoIsSongProvider()
+        {
+            var rnd = new Random();
+            
+            var players = Room.GetPlayers();
+            var r = rnd.Next(players.Count);
+            var luckyPlayer = players[r];
 
-            var link = SongGuesserHelper.ProcessLink("https://www.youtube.com/watch?v=5ZBgx1NeUWg&ab_channel=WejustmanRecords");
+            var isHostPacket = new SongGuessingIsHostPacket { IsSongProvider = true };
+            var isNotHostPacket = new SongGuessingIsHostPacket { IsSongProvider = false };
 
+            Room.SendToPlayer(luckyPlayer, isHostPacket);
+            foreach (var player in players.Except(new List <Player>{ luckyPlayer}))
+            {
+                 
+            }
+            
         }
 
         public override int GetSceneTime()
@@ -41,15 +63,8 @@ namespace DrunkenboldeServer.Scene
         /// <param name="packet">the packet</param>
         public override void OnPacketReceived(Player player, JsonPacket packet)
         {
-            /// Song link paket
-            /// 
             if (packet.GetPacketType() == PacketType.SongGuessingSongPacket)
             {
-                if (!player.IsSongProvider)
-                {
-                    return;
-                }
-
                 var songLinkPacket = packet as SongGuessingPacket;
                 if (songLinkPacket == null)
                 {
@@ -57,35 +72,38 @@ namespace DrunkenboldeServer.Scene
                 }
 
                 var link = songLinkPacket.SongLink;
-                if (!string.IsNullOrEmpty(SongGuesserHelper.ProcessLink(link)))
+                var processedLink = SongGuesserHelper.ProcessLink(link);
+                if (!string.IsNullOrEmpty(processedLink))
                 {
-                    Room.SendToAllPlayers(new SongGuessingPacket { SongLink = link });
-                    /// Send to all clients
+                    currentSong.Title = songLinkPacket.SongTitle;
+                    currentSong.Artist = songLinkPacket.SongArtist;
+                    Room.SendToAllPlayers(new SongGuessingPacket { SongLink = processedLink });
                 }
 
             }
 
-            /// Song Antwort paket
-            /// 
             if (packet.GetPacketType() == PacketType.SongGuessingAnswerPacket)
             {
+                var songAnswerPacket = packet as SongGuessingAnswerPacket;
+                if (songAnswerPacket == null)
+                {
+                    return;
+                }
 
+                if (SongGuesserHelper.CheckIfAnswerRight(songAnswerPacket, currentSong))
+                {
+                    Room.SendToAllPlayers(new MessagePacket { Message = $"Spieler {player.DisplayName} hat die richtige Antwort gegeben." });
+                    Room.SendToAllPlayers(new SongGuessingPacket { SongLink = "" });
+                }
             }
-
-            /// Song was right paket
-            /// 
-            //// Bestätigung -> Gewinner 
-            if (packet.GetPacketType() == PacketType.SongGuessingAnswerRightPacket)
-            {
-
-            }
-
             
         }
 
         public override void OnPlayerConnected(Player player)
         {
-            ///
+            var isNotHostPacket = new SongGuessingIsHostPacket { IsSongProvider = false };
+            Room.SendToPlayer(player, isNotHostPacket);
+
         }
 
         public override void OnPlayerDisconnected(Player player)
@@ -95,18 +113,15 @@ namespace DrunkenboldeServer.Scene
 
         public override void OnSceneClosed()
         {
-            throw new NotImplementedException();
+            
         }
 
         public override void OnSceneStarted()
         {
-            throw new NotImplementedException();
         }
 
         public override void Tick()
         {
-            /// If players voted for end
-            /// IsDone=true;
         }
     }
 }

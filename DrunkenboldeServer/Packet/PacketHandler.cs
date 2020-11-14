@@ -51,8 +51,8 @@ namespace DrunkenboldeServer.Packet
                     return typeof(SongGuessingPacket);
                 case PacketType.SongGuessingAnswerPacket:
                     return typeof(SongGuessingAnswerPacket);
-                case PacketType.SongGuessingAnswerRightPacket:
-                    return typeof(SongGuessingAnswerRightPacket);
+                case PacketType.SongGuessingIsHostPacket:
+                    return typeof(SongGuessingIsHostPacket);
 
                 default:
                     return null;
@@ -74,6 +74,6 @@ namespace DrunkenboldeServer.Packet
         ShareResult = 8,
         SongGuessingSongPacket = 9,
         SongGuessingAnswerPacket = 10,
-        SongGuessingAnswerRightPacket = 11,
+        SongGuessingIsHostPacket = 11,
     }
 }

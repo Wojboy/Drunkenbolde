@@ -9,6 +9,8 @@ $(function () {
     var displayName = undefined;
     var roomName = undefined;
 
+    var isHost = false;
+
     var overallPoints = 0;
     var points = 0;
 
@@ -23,7 +25,7 @@ $(function () {
 
 
     const messageTypes = Object.freeze({
-        "LoginPacket": 0, "LoginPacketAnswer": 1, "Message": 2, "PlayerList": 3, "ChangeScene": 4, "GambleSet": 5, "GambleResult": 6, "ShareSet": 7, "ShareResult": 8 , "SongGuessingSongPacket" : 9, "SongGuessingAnswerPacket" : 10, "SongGuessingAnswerRightPacket" : 11,});
+        "LoginPacket": 0, "LoginPacketAnswer": 1, "Message": 2, "PlayerList": 3, "ChangeScene": 4, "GambleSet": 5, "GambleResult": 6, "ShareSet": 7, "ShareResult": 8, "SongGuessingSongPacket": 9, "SongGuessingAnswerPacket": 10, "SongGuessingIsHostPacket" : 11 });
     const sceneTypes = Object.freeze({ "Waiting": 0, "Gamble": 1, "Share": 2, "SongGuesser": 3 });
     var sceneStatesNames = ['Warteraum', 'Gamble', 'Schlücke verteilen' , 'Lieder raten'];
     var gameNames = ["Pferderennen"];
@@ -98,7 +100,28 @@ $(function () {
             } else if (messageType === messageTypes.SongGuessingSongPacket) {
                 var songGuessingPacket = jQuery.parseJSON(messageData);
                 var songLink = songGuessingPacket["SongLink"];
-                $("#song-guesser-link").src = "https://www.youtube.com/embed/" + songLink;
+
+                if (isHost) {
+                    $("#iframe-dj").html("<iframe id=\"song-guesser-dj-link\" width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/" + songLink + "?autoplay=1\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture\" allowfullscreen></iframe>");
+                }
+                else {
+                    $("#iframe-guesser").html("<iframe id=\"song-guesser-guesser-link\" width=\"1\" height=\"1\" src=\"https://www.youtube.com/embed/" + songLink + "?autoplay=1\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture\" allowfullscreen></iframe>");
+                }
+                
+
+            } else if (messageType === messageTypes.SongGuessingIsHostPacket) {
+                var isHostPacket = jQuery.parseJSON(messageData);
+                var isHost = isHostPacket["IsSongProvider"];
+
+                if (isHost) {
+                    $("#song-dj").show();
+                    $("#scene-description").html("Du bist DJ");
+
+                }
+                else {
+                    $("#song-guesser").show();
+                    $("#scene-description").html("Du bist ein Ratefuchs");
+                }
             }
 
 
@@ -299,6 +322,26 @@ $(function () {
             sendGambleSet(0, 3);
         }
     });
+
+    $("#sendSongButton").click(function () {
+        var songPacket = new Object();
+        songPacket.SongLink = $("#songLink").val();
+        songPacket.SongTitle = $("#songTitle").val();
+        songPacket.SongArtist = $("#songArtist").val();
+        var data = JSON.stringify(songPacket);
+
+        game.server.post(messageTypes.SongGuessingSongPacket, data);
+    });
+
+    $("#sendAnswerButton").click(function () {
+        var songAnswerPacket = new Object();
+        songAnswerPacket.SongTitle = $("#songGuesserTitle").val();
+        songAnswerPacket.SongArtist = $("#songGuesserArtist").val();
+        var data = JSON.stringify(songAnswerPacket);
+
+        game.server.post(messageTypes.SongGuessingAnswerPacket, data);
+    });
+
     function sendGambleSet(black, red) {
         var gambleSetPacket = new Object();
         gambleSetPacket.AmountRed = black;
