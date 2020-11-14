@@ -22,9 +22,10 @@ $(function () {
     var duplicate_card = 0;
 
 
-    const messageTypes = Object.freeze({"LoginPacket": 0, "LoginPacketAnswer": 1, "Message" : 2, "PlayerList": 3, "ChangeScene": 4, "GambleSet": 5, "GambleResult": 6, "ShareSet": 7, "ShareResult": 8});
-    const sceneTypes = Object.freeze({ "Waiting": 0, "Gamble": 1, "Share": 2 });
-    var sceneStatesNames = ['Warteraum', 'Gamble', 'Schlücke verteilen' , 'Spiel: ', 'Spiel vorbei'];
+    const messageTypes = Object.freeze({
+        "LoginPacket": 0, "LoginPacketAnswer": 1, "Message": 2, "PlayerList": 3, "ChangeScene": 4, "GambleSet": 5, "GambleResult": 6, "ShareSet": 7, "ShareResult": 8 , "SongGuessingSongPacket" : 9, "SongGuessingAnswerPacket" : 10, "SongGuessingAnswerRightPacket" : 11,});
+    const sceneTypes = Object.freeze({ "Waiting": 0, "Gamble": 1, "Share": 2, "SongGuesser": 3 });
+    var sceneStatesNames = ['Warteraum', 'Gamble', 'Schlücke verteilen' , 'Lieder raten'];
     var gameNames = ["Pferderennen"];
     var nameCookie = Cookies.get("name");
     var roomCookie = Cookies.get("room");
@@ -68,7 +69,7 @@ $(function () {
                 playerTable = obj2;
                 $(".player-highscore-table tbody > tr").remove();
                 $.each(obj2["Players"],
-                    function(i, item) {
+                    function (i, item) {
 
                         if (item["PlayerId"] === userId) {
                             points = item["Points"];
@@ -94,7 +95,12 @@ $(function () {
                 currentSceneDuration = obj3["SceneDuration"];
                 changeVisualSceneState(currentScene);
                 changeScene(currentScene);
+            } else if (messageType === messageTypes.SongGuessingSongPacket) {
+                var songGuessingPacket = jQuery.parseJSON(messageData);
+                var songLink = songGuessingPacket["SongLink"];
+                $("#song-guesser-link").src = "https://www.youtube.com/embed/" + songLink;
             }
+
 
 
             // Auswertung nach Scene
@@ -200,6 +206,11 @@ $(function () {
             $("#duplicate-drinks-scene").show();
             cardLoader();
         }
+        else if (state === sceneTypes.SongGuesser) {
+            $("#song-guesser-scene").show();
+
+        }
+
         else if (state === sceneTypes.Share) {
             $("#share-drinks-scene").show();
             $(".share-player-list").html("");

@@ -31,29 +31,29 @@ namespace DrunkenboldeServer.Packet
             {
                 case PacketType.LoginPacket:
                     return typeof(LoginPacket);
-                    break;
                 case PacketType.ChangeScene:
                     return typeof(ChangeScenePacket);
-                    break;
                 case PacketType.GambleResult:
                     return typeof(GambleResultPacket);
-                    break;
                 case PacketType.GambleSet:
                     return typeof(GambleSetPacket);
-                    break;
                 case PacketType.LoginPacketAnswer:
                     return typeof(LoginAnswerPacket);
-                    break;
                 case PacketType.Message:
                     return typeof(MessagePacket);
-                    break;
                 case PacketType.PlayerList:
                     return typeof(PlayerListPacket);
-                    break;
                 case PacketType.ShareSet:
                     return typeof(ShareSetPacket);
                 case PacketType.ShareResult:
                     return typeof(ShareResultPacket);
+                case PacketType.SongGuessingSongPacket:
+                    return typeof(SongGuessingPacket);
+                case PacketType.SongGuessingAnswerPacket:
+                    return typeof(SongGuessingAnswerPacket);
+                case PacketType.SongGuessingAnswerRightPacket:
+                    return typeof(SongGuessingAnswerRightPacket);
+
                 default:
                     return null;
             }
@@ -71,6 +71,9 @@ namespace DrunkenboldeServer.Packet
         GambleSet = 5,
         GambleResult = 6,
         ShareSet = 7,
-        ShareResult = 8
+        ShareResult = 8,
+        SongGuessingSongPacket = 9,
+        SongGuessingAnswerPacket = 10,
+        SongGuessingAnswerRightPacket = 11,
     }
 }

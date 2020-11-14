@@ -16,7 +16,6 @@ namespace DrunkenboldeServer
         Waiting = 0,
         Gamble = 1,
         Share = 2,
-        VoteGame = 3,
-        Game = 4
+        SongGuesser = 3,
     }
 }

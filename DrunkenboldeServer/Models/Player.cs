@@ -22,5 +22,7 @@ namespace DrunkenboldeServer.Models
         public bool Active { get; set; }
 
         [JsonProperty] public int Id { get; set; }
+
+        [JsonProperty] public bool IsSongProvider { get; set; }
     }
 }

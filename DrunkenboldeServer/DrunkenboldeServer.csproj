@@ -109,6 +109,7 @@
   <ItemGroup>
     <Compile Include="GameConfig.cs" />
     <Compile Include="GameHub.cs" />
+    <Compile Include="GameLogic\SongGuessing\SongGuesserHelper.cs" />
     <Compile Include="GameLoop.cs" />
     <Compile Include="GameRoom.cs" />
     <Compile Include="GameRoomManager.cs" />
@@ -124,11 +125,15 @@
     <Compile Include="Packet\PlayerListPacket.cs" />
     <Compile Include="Packet\ShareResultPacket.cs" />
     <Compile Include="Packet\ShareSetPacket.cs" />
+    <Compile Include="Packet\SongGuessingAnswerPacket.cs" />
+    <Compile Include="Packet\SongGuessingAnswerRightPacket.cs" />
+    <Compile Include="Packet\SongGuessingPacket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scene\GambleScene.cs" />
     <Compile Include="Scene\Scene.cs" />
     <Compile Include="Scene\SceneManager.cs" />
     <Compile Include="Scene\ShareScene.cs" />
+    <Compile Include="Scene\SongGuessingScene.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="Scene\WaitingScene.cs" />

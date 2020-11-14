@@ -19,6 +19,7 @@ namespace DrunkenboldeServer.Scene
             GameSettings = settings;
             GameRoom = room;
             CurrentScene = new ShareScene();
+            //CurrentScene = new SongGuessingScene();
             CurrentScene.Init(GameRoom, this);
             CurrentScene.StartTime = DateTime.Now;
         }
