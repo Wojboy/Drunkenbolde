@@ -40,6 +40,9 @@ namespace DrunkenboldeServer.Scene
 
         public override void OnPacketReceived(Player player, JsonPacket packet)
         {
+            if (ResultsSent)
+                return;
+
             if (packet.GetType() == typeof(ShareSetPacket))
             {
                 var setPacket = (ShareSetPacket) packet;
@@ -119,10 +122,20 @@ namespace DrunkenboldeServer.Scene
       
                 }
                 Room.SendToAllPlayers(Result);
-            }
-            else
-            {
 
+                // Ziehe jetzt die ausgegebenen Schlücke ab
+                foreach (KeyValuePair<int, int> item in PlayedSharedValues)
+                {
+                    var player = Room.GetPlayers().FirstOrDefault(p => p.Id == item.Key);
+
+                    if (player == null)
+                        continue;
+
+                    player.Points -= item.Value;
+                }
+
+                // Schicke neue Punktestand an Player
+                Room.SendToAllPlayers(PlayerListPacket.GenerateFromPlayerList(Room.GetPlayers()));
             }
         }
     }

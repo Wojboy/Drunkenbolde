@@ -45,14 +45,14 @@
     background: rgba(20,20,20,0.8);
 }
 .scene-description {
-    display: inline-flex;
+
     font-size: 1.1em;
     color: #fff;
     font-family: Verdana;
     text-shadow: 2px 2px 2px #000;
     margin-bottom: 20px;
     padding: 5px;
-    background: rgba(100,100,100,0.5);
+
 }
 .scene-manager {
     left: 20%;
@@ -197,6 +197,8 @@
     border: 1px solid #777;
 }
 .animation-beer-body {
+    -webkit-filter: blur(2px); /* Safari 6.0 - 9.0 */
+    filter: blur(2px);
     width: 100%;
     z-index: 4;
     background-image: url("../Data/beer_body.png");
@@ -243,6 +245,9 @@
     margin-bottom: 20px;
     float: left;
 }
+.share-player-main {
+    border: 2px solid red !important;
+}
 .share-player-amount-total {
     display: inline-block;
     color: #D6564D;
@@ -261,4 +266,16 @@
     font-size: 4em;
     font-family: Impact, Charcoal, sans-serif;
     text-shadow: 2px 2px 2px #000;
+}
+.share-beer-icon {
+    background-image: url("../Data/beer2.png");
+    background-size: 100% 100%;
+    width: 50px;
+    height: 50px;
+}
+.gamble-looser {
+    font-size: 2em;
+}
+.gamble-winner {
+    font-size: 2em;
 }

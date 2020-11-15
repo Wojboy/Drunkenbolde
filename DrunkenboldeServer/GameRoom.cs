@@ -31,7 +31,7 @@ namespace DrunkenboldeServer
             GameLoop = new GameLoop(this);
             GameLoop.Start();
             Settings = new GameSettings();
-            SceneManager = new SceneManager(GameLoop, Settings, this);
+
 
         }
 
@@ -124,6 +124,11 @@ namespace DrunkenboldeServer
             if (Players.Count == 0)
                 return;
             SendToPlayers(Players, packet);
+        }
+
+        public void Init()
+        {
+            SceneManager = new SceneManager(GameLoop, Settings, this);
         }
     }
 }

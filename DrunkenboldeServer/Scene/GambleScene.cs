@@ -121,6 +121,7 @@ namespace DrunkenboldeServer.Scene
                 }
 
                 Room.SendToAllPlayers(Results);
+                Room.SendToAllPlayers(PlayerListPacket.GenerateFromPlayerList(Room.GetPlayers()));
                 // Zeige Resultate noch für 3 Sekunden an
             }
         }

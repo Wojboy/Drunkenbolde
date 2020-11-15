@@ -18,7 +18,7 @@ namespace DrunkenboldeServer.Scene
             GameLoop = loop;
             GameSettings = settings;
             GameRoom = room;
-            CurrentScene = new ShareScene();
+            CurrentScene = new GambleScene();
             CurrentScene.Init(GameRoom, this);
             CurrentScene.StartTime = DateTime.Now;
         }

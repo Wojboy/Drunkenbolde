@@ -101,6 +101,7 @@ namespace DrunkenboldeServer
                 }
                 
                 room.ReceivePacket(connectionId, loginPacket);
+                room.Init();
             }
             else
             {   

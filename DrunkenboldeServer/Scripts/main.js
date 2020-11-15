@@ -122,12 +122,12 @@ $(function () {
                             if (item["PlayerId"] === userId) {
                                 if ((isBlack && item["AmountBlack"] > 0) || (!isBlack && item["AmountRed"] > 0)) {
                                     $("#duplicate-results-desc")
-                                        .html("Du hast gewonnen <div style='color: mediumaquamarine;'>+ 3</div>");
+                                        .html("Du hast gewonnen <div class='gamble-winner'>+ 3</div>");
                                 } else if (item["AmountBlack"] === 0 && item["AmountRed"] === 0) {
                                     $("#duplicate-results-desc").html("Du hast nicht mitgespielt.");
                                 } else {
                                     $("#duplicate-results-desc")
-                                        .html("Du hast verloren, du noob <div style='color: indianred;'>- 3</div>");
+                                        .html("Du hast verloren, du noob <div class='gamble-looser'>- 3</div>");
                                 }
                             } else {
                                 if ((isBlack && item["AmountBlack"] > 0) || (!isBlack && item["AmountRed"] > 0)) {
@@ -151,19 +151,23 @@ $(function () {
                     displaySmallMessage(messageData);
                     var obj6 = jQuery.parseJSON(messageData);
                     $("#share-title").html("Schlücke Verteilen - Ergebnisse");
-                    $("#share-description").html("");
+                    $("#share-description").hide();
                     $("#share-drinks-scene").show();
                     $(".share-player-list").html("");
-                    $.each(obj6["Data"], function(i, item) {
+                    $.each(obj6["Data"], function (i, item) {
+                        var append = "";
                         if (item["DrinkValue"] > 0) {
+                            if (item["PlayerId"] === userId)
+                            append = "share-player-main";
+                
                             var n2 = "share-player" + item["PlayerId"];
-                            var ele = "<div class='share-player' id='" +
+                            var ele = "<div class='share-player " + append +"' id='" +
                                 n2 +
                                 "'><div class='share-player-name'>" +
                                 item["DisplayName"] +
                                 "</div><div class='share-player-count'>" +
                                 item["DrinkValue"] +
-                                "</div></div>";
+                                "</div><div class='share-beer-icon'></div></div>";
                             $(".share-player-list").append(ele);
                         }
                     });
