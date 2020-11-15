@@ -91,17 +91,21 @@ namespace DrunkenboldeServer
             {
                 // Packet is Login Packet
                 LoginPacket loginPacket = (LoginPacket) packet;
-
+                var roomCreated = false;
                 var room = Rooms.FirstOrDefault(r => r.RoomName == loginPacket.Room);
 
                 if (room == null)
                 {
                     room = new GameRoom(loginPacket.Room);
                     Rooms.Add(room);
+                    roomCreated = true;
                 }
-                
+                                
                 room.ReceivePacket(connectionId, loginPacket);
-                room.Init();
+                if (roomCreated)
+                {
+                    room.InitGameRoom();
+                }
             }
             else
             {   
@@ -113,7 +117,6 @@ namespace DrunkenboldeServer
                         room.ReceivePacket(player, packet);
                 }
             }
-
         }
     }
 }

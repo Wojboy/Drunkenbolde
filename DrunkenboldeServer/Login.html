@@ -22,7 +22,7 @@
                     if (name !== "" && room !== "") {
 
                         Cookies.set('name', name.val());
-                        Cookies.set('room', name.val());
+                        Cookies.set('room', room.val());
                         $("#login-container").hide();
                         $("#loader").show();
                         setTimeout(function(){ window.location.href = "Game.html"; }, 1000);

@@ -51,6 +51,12 @@ namespace DrunkenboldeServer.Packet
                     return typeof(WaitingGamesListPacket);
                 case PacketType.WaitingVote:
                     return typeof(WaitingVotePacket);
+                case PacketType.SongGuessingSongPacket:
+                    return typeof(SongGuessingPacket);
+                case PacketType.SongGuessingAnswerPacket:
+                    return typeof(SongGuessingAnswerPacket);
+                case PacketType.SongGuessingIsHostPacket:
+                    return typeof(SongGuessingIsHostPacket);
                 default:
                     return null;
             }
@@ -71,5 +77,8 @@ namespace DrunkenboldeServer.Packet
         ShareResult = 8,
         WaitingGamesList = 9,
         WaitingVote = 10
+        SongGuessingSongPacket = 9,
+        SongGuessingAnswerPacket = 10,
+        SongGuessingIsHostPacket = 11,
     }
 }

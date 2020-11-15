@@ -61,6 +61,43 @@
             </div>
         </center>
     </div>
+    <div class="scene" id="song-guesser-scene">
+        <center>
+            <div class="scene-title" id="share-title">Lieder raten</div>
+            <div class="scene-description" id="share-description"></div>
+
+
+            <!-- iframe für den DJ -->
+            <div id="iframe-dj">
+                <iframe id="song-guesser-dj-link" width="560" height="315" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <!-- iframe für die guesser -->
+            <div id="iframe-guesser">
+                <iframe id="song-guesser-guesser-link" width="1" height="1" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+                <!-- input für DJ -->
+          <br />
+          <div id="song-dj"  style="display:none">
+              <label for="songLink">Youtube-Link:</label>
+              <input type="text" id="songLink" name="songLink"><br><br>
+              <label for="songTitle">Titel:</label>
+              <input type="text" id="songTitle" name="songTitle"><br><br>
+              <label for="songArtist">Künstler:</label>
+              <input type="text" id="songArtist" name="songArtist"><br><br>
+              <button type="button" id="sendSongButton">Abschicken</button>
+          </div>
+          
+          <!-- input für guesser-->
+          <div id="song-guesser" style="display:none">
+              <label for="songGuesserTitle">Titel:</label>
+              <input type="text" id="songGuesserTitle" name="songGuesserTitle"><br><br>
+              <label for="songGuesserArtist">Künstler:</label>
+              <input type="text" id="songGuesserArtist" name="songGuesserArtist"><br><br>
+              <button type="button" id="sendAnswerButton">Abschicken</button>
+          </div>
+        </center>
+    </div>
+
 </div>
 <div class="top-right-menu">
     <div class="player-tab">

@@ -21,6 +21,7 @@ namespace DrunkenboldeServer.Scene
             CurrentScene = new GambleScene();
             CurrentScene.Init(GameRoom, this);
             CurrentScene.StartTime = DateTime.Now;
+            ChangeScene(CurrentScene);
         }
 
         public void Tick()
