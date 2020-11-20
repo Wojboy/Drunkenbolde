@@ -129,9 +129,8 @@
 }
 
 .top-right-menu {
-    z-index: 6;
+    z-index: 1;
     font-family: Impact, Charcoal, sans-serif;
-    background: #bbb;
     position: fixed;
     top: 0%;
     left: 100%;
@@ -142,6 +141,7 @@
 .player-tab {
     vertical-align: middle;
     background: #555;
+    border-radius: 0px 0px 0px 25px;
     padding: 5px;
     color: #fff;
     height: 30px;
@@ -160,6 +160,7 @@
     font-size: 1.3em;
     vertical-align: middle;
     margin-right: 20px;
+    margin-left: 17px;
     float: left;
 }
 
@@ -174,27 +175,41 @@
 .player-logout {
     float: left;
 }
-
+.highscore-own-name {
+    color: red;
+}
+.highscore-icon {
+    width: 15px;
+    height: 15px;
+    margin-top: 10px;
+    margin-right: 10px;
+}
 .player-highscore {
-    padding: 5px;
+    padding: 20px;
+    background: #333;
+    border: 1px solid #ffcd38;
 }
 
 .player-highscore-table {
+    font-size: 1.2em;
     font-family: Verdana;
+    color: #ffcd38;
+    text-shadow: 2px 2px 2px #000;
+
     border-collapse: collapse;
     width: 100%;
 }
 
 .player-highscore-table-header {
     font-family: Verdana;
-    padding: 5px;
-    font-size: 0.95em;
     text-align: left;
+    color: #fff;
+    border-bottom: 1px solid #ffcd38;
 }
 
 .player-highscore-table th, td {
     padding: 5px;
-    border: 1px solid #777;
+    
 }
 .animation-beer-body {
     -webkit-filter: blur(2px); /* Safari 6.0 - 9.0 */
@@ -228,6 +243,43 @@
     font-size: 4em;
     color: #ffcd38;
     font-family: Impact, Charcoal, sans-serif;
+}
+.game-vote {
+    background-image: url("../Data/textur.png");
+    background-size: 100% 100%;
+    width: 250px;
+    height: 250px;
+    border: 2px solid #ffcd38;
+    border-radius: 10px;
+    margin-left: 20px;
+    margin-bottom: 20px;
+    float: left;
+}
+.game-vote-selected {
+    box-shadow: 0 0 10px #9ecaed !important;
+}
+.game-vote-icon {
+    width: 30px;
+    height: 30px;
+    margin-top: -120px;
+}
+.game-vote-image {
+    width: 100%;
+    height: 100%;
+    background-size: 100% 100%;
+}
+.game-vote-selected {
+    border: 2px solid #fff;
+}
+.game-vote-count {
+    color: #fff;
+}
+.game-vote-name {
+    padding-top: 60px;
+    font-family: Impact, Charcoal, sans-serif;
+    color: #ffcd38;
+    font-size: 1.3em;
+    text-shadow: 2px 2px 2px #000;
 }
 
 .share-player-list {

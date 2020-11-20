@@ -15,6 +15,9 @@ namespace DrunkenboldeServer.Packet
         [JsonProperty]
         public int SceneDuration { get; set; }
 
+        [JsonProperty]
+        public int GameType { get; set; }
+
         public override bool IsValid()
         {
             return true;

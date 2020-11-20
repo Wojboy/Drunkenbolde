@@ -11,7 +11,7 @@ namespace DrunkenboldeServer.Packet
     {
 
         [JsonProperty]
-        public List<ShareResultElement> Data;
+        public List<ShareResultElement> Data { get; set; }
 
         public override bool IsValid()
         {
@@ -28,15 +28,15 @@ namespace DrunkenboldeServer.Packet
     public class ShareResultElement
     {
         [JsonProperty]
-        public string DisplayName;
+        public string DisplayName { get; set; }
 
         [JsonProperty]
-        public int PlayerId;
+        public int PlayerId { get; set; }
 
         [JsonProperty]
-        public int DrinkValue;
+        public int DrinkValue { get; set; }
 
-        public Dictionary<int,int> DrinkData;
+        public Dictionary<int,int> DrinkData { get; set; }
     }
 
 

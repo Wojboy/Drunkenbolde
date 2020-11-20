@@ -56,8 +56,8 @@ namespace DrunkenboldeServer
                     room.PlayerDisconnected(player);
 
                     // Kein Spieler übrig, schließe raum
-                    var activePlayer = room.GetPlayers().FirstOrDefault(a => a.Active);
-                    if (activePlayer == null)
+                    var activePlayer = room.GetActivePlayers();
+                    if (activePlayer.Count == 0)
                     {
                         room.Stop();
                         Rooms.Remove(room);

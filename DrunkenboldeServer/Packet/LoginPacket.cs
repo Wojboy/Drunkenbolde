@@ -10,10 +10,10 @@ namespace DrunkenboldeServer.Packet
     public class LoginPacket : JsonPacket
     {
         [JsonProperty]
-        public string Room;
+        public string Room { get; set; }
 
         [JsonProperty]
-        public string DisplayName;
+        public string DisplayName { get; set; }
 
 
         public override bool IsValid()

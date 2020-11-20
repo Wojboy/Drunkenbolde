@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
 using DrunkenboldeServer.Models;
 using DrunkenboldeServer.Packet;
+using DrunkenboldeServer.Scene;
 
-namespace DrunkenboldeServer.Scene
+namespace DrunkenboldeServer.GameLogic.HorseGame
 {
     public class HorseGameScene : GameScene
     {
@@ -43,11 +41,6 @@ namespace DrunkenboldeServer.Scene
         public override void OnSceneClosed()
         {
  
-        }
-
-        public override SceneType GetSceneType()
-        {
-            return SceneType.HorseScene;
         }
 
         public override void Tick()

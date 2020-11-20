@@ -9,7 +9,7 @@ namespace DrunkenboldeServer.Packet
     [JsonObject(MemberSerialization.OptIn)]
     public class WaitingVotePacket : JsonPacket
     {
-        [JsonProperty] public int GameId;
+        [JsonProperty] public int GameId { get; set; }
 
         public override bool IsValid()
         {

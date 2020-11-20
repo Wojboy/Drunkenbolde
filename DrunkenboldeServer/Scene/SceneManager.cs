@@ -19,8 +19,7 @@ namespace DrunkenboldeServer.Scene
             GameSettings = settings;
             GameRoom = room;
             CurrentScene = new GambleScene();
-            CurrentScene.Init(GameRoom, this);
-            CurrentScene.StartTime = DateTime.Now;
+
             ChangeScene(CurrentScene);
         }
 
@@ -31,18 +30,28 @@ namespace DrunkenboldeServer.Scene
             {
                 Type t = CurrentScene.NextScene();
                 var instance = (DrunkenboldeServer.Scene.Scene) Activator.CreateInstance(t);
-                instance.StartTime = DateTime.Now;
-                instance.Init(GameRoom, this);
                 ChangeScene(instance);
             }
         }
 
-        public void ChangeScene(DrunkenboldeServer.Scene.Scene scene)
+        public void ChangeScene(DrunkenboldeServer.Scene.Scene scene, int gameId = -1)
         {
+            if (CurrentScene != null)
+                scene.LastSceneType = CurrentScene.GetType();
+            scene.StartTime = DateTime.Now;
             GameRoom.SendToAllPlayers(new MessagePacket() {Message = " Scene gewechselt: " + scene.GetType().FullName});
             CurrentScene?.OnSceneClosed();
             CurrentScene = scene;
-            GameRoom.SendToAllPlayers(new ChangeScenePacket() {SceneDuration =  DisableTimedScenes ? 0 : scene.GetSceneTime(), SceneType = (int)scene.GetSceneType()});
+            CurrentScene.Init(GameRoom, this);
+            CurrentScene.StartTime = DateTime.Now;
+
+            var p = new ChangeScenePacket()
+                {SceneDuration = DisableTimedScenes ? 0 : scene.GetSceneTime(), SceneType = (int) scene.GetSceneType()};
+            if (gameId != -1)
+                p.GameType = gameId;
+            GameRoom.SendToAllPlayers(p);
+
+            scene.OnSceneStarted();
 
         }
 

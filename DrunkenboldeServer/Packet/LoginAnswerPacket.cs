@@ -12,6 +12,8 @@ namespace DrunkenboldeServer.Packet
         [JsonProperty]
         public int PlayerId { get; set; }
 
+        [JsonProperty]
+        public string DisplayName { get; set; }
 
         public override bool IsValid()
         {

@@ -5,7 +5,6 @@ namespace DrunkenboldeServer.Models
     /// <summary>
     /// Model which holds player data.
     /// </summary>
-    [JsonObject(MemberSerialization.OptIn)]
     public class Player
     {
         public Player(string connectionId, string displayName)
@@ -14,13 +13,15 @@ namespace DrunkenboldeServer.Models
             DisplayName = displayName;
         }
         public string ConnectionId;
-        [JsonProperty] public string DisplayName { get; set; }
+        public string DisplayName { get; set; }
 
-        [JsonProperty] public int Points { get; set; }
-        [JsonProperty] public int OverallPoints { get; set; }
+        public int Points { get; set; }
+        public int OverallPoints { get; set; }
+        public int Drunk { get; set; }
+        public int LastPoints = -1;
 
         public bool Active { get; set; }
 
-        [JsonProperty] public int Id { get; set; }
+        public int Id { get; set; }
     }
 }

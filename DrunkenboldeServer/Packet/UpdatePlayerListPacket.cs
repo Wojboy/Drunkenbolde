@@ -8,9 +8,9 @@ using Newtonsoft.Json;
 namespace DrunkenboldeServer.Packet
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public class PlayerListPacket : JsonPacket
+    public class UpdatePlayerListPacket : JsonPacket
     {
-        [JsonProperty] public List<PlayerListPlayer> Players = new List<PlayerListPlayer>();
+        [JsonProperty] public List<PlayerListPlayer> Players { get; set; }
 
         public override bool IsValid()
         {
@@ -19,17 +19,17 @@ namespace DrunkenboldeServer.Packet
 
         public override PacketType GetPacketType()
         {
-            return PacketType.PlayerList;
+            return PacketType.UpdatePlayerList;
         }
 
-        public static PlayerListPacket GenerateFromPlayerList(List<Player> players)
+        public static UpdatePlayerListPacket GenerateFromPlayerList(List<Player> players)
         {
-            PlayerListPacket packet = new PlayerListPacket();
-
+            UpdatePlayerListPacket packet = new UpdatePlayerListPacket();
+            packet.Players = new List<PlayerListPlayer>();
             // Sortiere nach Punkten vor
-            foreach(Player p in players.OrderByDescending(p => p.OverallPoints))
+            foreach (Player p in players.OrderByDescending(p => p.OverallPoints))
             {
-                packet.Players.Add(new PlayerListPlayer() {DisplayName = p.DisplayName, PlayerId = p.Id, OverallPoints = p.OverallPoints, Points = p.Points});
+                packet.Players.Add(new PlayerListPlayer() { DisplayName = p.DisplayName, PlayerId = p.Id });
             }
             return packet;
         }
@@ -40,8 +40,6 @@ namespace DrunkenboldeServer.Packet
         {
             [JsonProperty] public int PlayerId { get; set; }
             [JsonProperty] public string DisplayName { get; set; }
-            [JsonProperty] public int Points { get; set; }
-            [JsonProperty] public int OverallPoints { get; set; }
         }
     }
 }

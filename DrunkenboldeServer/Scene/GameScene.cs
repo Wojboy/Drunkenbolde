@@ -16,5 +16,10 @@ namespace DrunkenboldeServer.Scene
         {
             return -1;
         }
+
+        public override SceneType GetSceneType()
+        {
+            return SceneType.Game;
+        }
     }
 }

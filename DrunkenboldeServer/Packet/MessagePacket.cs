@@ -10,7 +10,7 @@ namespace DrunkenboldeServer.Packet
     public class MessagePacket : JsonPacket
     {
         [JsonProperty]
-        public string Message;
+        public string Message { get; set; }
 
         public override bool IsValid()
         {

@@ -25,8 +25,8 @@ namespace DrunkenboldeServer
             this.RoomName = name;
             this.Players = new List<Player>();
 
-            //Players.Add(new Player(null, "Franz") { Active = true, Id = 5, OverallPoints = 40, Points = 5 });
-            //Players.Add(new Player(null, "Xaverasdfsdfsdfdf") { Active = true, Id = 6, OverallPoints = 20, Points = 7 });
+            Players.Add(new Player(null, "Franz") { Active = true, Id = 5, OverallPoints = 40, Points = 5, Drunk = 5 });
+            Players.Add(new Player(null, "Xaverasdfsdfsdfdf") { Active = true, Id = 6, OverallPoints = 20, Points = 7, Drunk = 0 });
 
             GameLoop = new GameLoop(this);
             GameLoop.Start();
@@ -46,6 +46,8 @@ namespace DrunkenboldeServer
                 p = new Player(connectionId, loginPacket.DisplayName);
                 p.Active = true;
                 p.Points = 7;
+                p.OverallPoints = 0;
+                p.Drunk = 0;
                 Players.Add(p);
 
                 PlayerConnected(p);
@@ -53,7 +55,7 @@ namespace DrunkenboldeServer
             else
             {
                 p.ConnectionId = connectionId;
-
+                p.Active = true;
                 PlayerConnected(p);
 
                 // sende an alten Spieler disconnect aufruf
@@ -62,8 +64,9 @@ namespace DrunkenboldeServer
 
         protected void PlayerConnected(Player player)
         {
-            SendToPlayer(player, new LoginAnswerPacket() {PlayerId = player.Id});
-            SendToPlayer(player, PlayerListPacket.GenerateFromPlayerList(Players));
+            SendToPlayer(player, new LoginAnswerPacket() {PlayerId = player.Id, DisplayName = player.DisplayName});
+            SendToPlayer(player, UpdatePlayerPacket.GenerateFromPlayer(player));
+            SendToAllPlayers( UpdatePlayerListPacket.GenerateFromPlayerList(Players));
             SendToAllPlayers(new MessagePacket() { Message = "Spieler '" + player.DisplayName + "' verbunden." });
             SceneManager?.PlayerConnected(player);
         }
@@ -73,7 +76,10 @@ namespace DrunkenboldeServer
             var data = PacketHandler.EncodePacket(packet);
             if (data == null)
                 throw new Exception("Packet is not valid");
-            var connectionIds = (from p in players where p.Active select p.ConnectionId).ToList();
+            var connectionIds = (from p in players where (p.Active && p.ConnectionId != null) select p.ConnectionId).ToList();
+
+            if (connectionIds.Count == 0)
+                return;
 
             var hubContext = GlobalHost.ConnectionManager.GetHubContext<GameHub>();
             hubContext.Clients.Clients(connectionIds).Post((int)packet.GetPacketType(), data);
@@ -85,14 +91,15 @@ namespace DrunkenboldeServer
             if (data == null)
                 throw new Exception("Packet is not valid");
             var hubContext = GlobalHost.ConnectionManager.GetHubContext<GameHub>();
-            hubContext.Clients.Client(p.ConnectionId).Post((int)packet.GetPacketType(), data);
+            if(p.ConnectionId != null && p.Active)
+                hubContext.Clients.Client(p.ConnectionId).Post((int)packet.GetPacketType(), data);
         }
 
         public void PlayerDisconnected(Player player)
         {
             player.Active = false;
             SendToAllPlayers(new MessagePacket() { Message = "Spieler '" + player.DisplayName + "' ist weg." });
-            SendToPlayer(player, PlayerListPacket.GenerateFromPlayerList(Players));
+            SendToAllPlayers(ScoreboardPacket.GenerateFromPlayerList(Players));
             SceneManager.PlayerDisconnected(player);
         }
 
@@ -101,9 +108,14 @@ namespace DrunkenboldeServer
             SceneManager.ReceivePacket(player, packet);
         }
 
-        public List<Player> GetPlayers()
+        public List<Player> GetActivePlayers()
         {
-            return Players;
+            return Players.Where(p => p.Active).ToList();
+        }
+
+        public int GetActivePlayersCount()
+        {
+            return Players.Count(p => p.Active);
         }
 
         public Player GetPlayer(string conString)

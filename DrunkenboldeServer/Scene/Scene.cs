@@ -7,7 +7,8 @@ namespace DrunkenboldeServer.Scene
     public abstract class Scene
     {
         public DateTime StartTime;
-        
+        public Type LastSceneType;
+
         protected GameRoom Room;
         protected SceneManager SceneManager;
         public bool IsDone { get; set; }

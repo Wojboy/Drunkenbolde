@@ -24,7 +24,7 @@ namespace DrunkenboldeServer.Scene
             Result = new ShareResultPacket();
             Result.Data = new List<ShareResultElement>();
 
-            foreach (var p in Room.GetPlayers())
+            foreach (var p in Room.GetActivePlayers())
             {
                 if (!p.Active)
                     continue;
@@ -35,7 +35,7 @@ namespace DrunkenboldeServer.Scene
         }
         public override Type NextScene()
         {
-            return typeof(WaitingScene);
+            return typeof(ScoreboardScene);
         }
 
         public override void OnPacketReceived(Player player, JsonPacket packet)
@@ -107,7 +107,7 @@ namespace DrunkenboldeServer.Scene
                     foreach (KeyValuePair<int, int> drinkData in ele.DrinkData)
                     {
                         // Suche austeilenden Spieler
-                        var player = Room.GetPlayers().FirstOrDefault(p => p.Id == drinkData.Key);
+                        var player = Room.GetActivePlayers().FirstOrDefault(p => p.Id == drinkData.Key);
 
                         if (player == null)
                             continue;
@@ -126,7 +126,7 @@ namespace DrunkenboldeServer.Scene
                 // Ziehe jetzt die ausgegebenen Schlücke ab
                 foreach (KeyValuePair<int, int> item in PlayedSharedValues)
                 {
-                    var player = Room.GetPlayers().FirstOrDefault(p => p.Id == item.Key);
+                    var player = Room.GetActivePlayers().FirstOrDefault(p => p.Id == item.Key);
 
                     if (player == null)
                         continue;
@@ -134,8 +134,11 @@ namespace DrunkenboldeServer.Scene
                     player.Points -= item.Value;
                 }
 
-                // Schicke neue Punktestand an Player
-                Room.SendToAllPlayers(PlayerListPacket.GenerateFromPlayerList(Room.GetPlayers()));
+                // Schicke neue Punktestand an Players
+                foreach (Player p in Room.GetActivePlayers())
+                {
+                    Room.SendToPlayer(p, UpdatePlayerPacket.GenerateFromPlayer(p));
+                }
             }
         }
     }

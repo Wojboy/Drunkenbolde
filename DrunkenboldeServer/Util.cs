@@ -11,13 +11,12 @@ namespace DrunkenboldeServer
 
 
 
-    public enum 
-        SceneType
+    public enum SceneType
     {
         Waiting = 0,
         Gamble = 1,
         Share = 2,
-		SongGuesser = 3,
-        HorseScene = 4
+        Scoreboard = 3,
+        Game = 4,
     }
 }

@@ -8,7 +8,7 @@ using DrunkenboldeServer.Packet;
 
 namespace DrunkenboldeServer.Scene
 {
-    public class SongGuessingScene : Scene
+    public class SongGuessingScene : GameScene
     {
         private Song currentSong { get; set; }
 
@@ -16,7 +16,7 @@ namespace DrunkenboldeServer.Scene
         {
             base.Init(room, scene);
             currentSong = new Song();
-            this.DetermineWhoIsSongProvider();
+
         }
 
         /// <summary>
@@ -26,7 +26,7 @@ namespace DrunkenboldeServer.Scene
         {
             var rnd = new Random();
             
-            var players = Room.GetPlayers();
+            var players = Room.GetActivePlayers();
             var r = rnd.Next(players.Count);
             var luckyPlayer = players[r];
 
@@ -44,11 +44,6 @@ namespace DrunkenboldeServer.Scene
         public override int GetSceneTime()
         {
             return -1;
-        }
-
-        public override SceneType GetSceneType()
-        {
-            return SceneType.SongGuesser;
         }
 
         public override Type NextScene()
@@ -118,6 +113,7 @@ namespace DrunkenboldeServer.Scene
 
         public override void OnSceneStarted()
         {
+            this.DetermineWhoIsSongProvider();
         }
 
         public override void Tick()

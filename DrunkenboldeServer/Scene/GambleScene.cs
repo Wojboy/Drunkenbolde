@@ -17,11 +17,11 @@ namespace DrunkenboldeServer.Scene
             base.Init(room, scene);
             Results = new GambleResultPacket { States = new List<GambleResultItem>() };
 
-            foreach (Player p in Room.GetPlayers())
+            foreach (Player p in Room.GetActivePlayers())
             {
-                if (p.Active)
-                    Results.States.Add(new GambleResultItem() { PlayerId = p.Id, PlayerName = p.DisplayName });
+                Results.States.Add(new GambleResultItem() { PlayerId = p.Id, PlayerName = p.DisplayName });
             }
+
         }
         public override Type NextScene()
         {
@@ -98,7 +98,7 @@ namespace DrunkenboldeServer.Scene
                 var black = Results.Black;
                 foreach (var d in Results.States)
                 {
-                    var player = Room.GetPlayers().FirstOrDefault(p => p.Id == d.PlayerId);
+                    var player = Room.GetActivePlayers().FirstOrDefault(p => p.Id == d.PlayerId);
                     if (player != null)
                     {
                         int add = 0;
@@ -121,7 +121,7 @@ namespace DrunkenboldeServer.Scene
                 }
 
                 Room.SendToAllPlayers(Results);
-                Room.SendToAllPlayers(PlayerListPacket.GenerateFromPlayerList(Room.GetPlayers()));
+                Room.SendToAllPlayers(ScoreboardPacket.GenerateFromPlayerList(Room.GetActivePlayers()));
                 // Zeige Resultate noch für 3 Sekunden an
             }
         }
